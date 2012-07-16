@@ -5,7 +5,7 @@ var deck = new Deck();
 var playAsDealer = function() {
     var hand = new Hand(deck.deal(), deck.deal());
     var newCard;
-    if (hand.score() < 17) {            
+    while (hand.score() < 17) {            
         // Deal card from deck.
         newCard = deck.deal();
         // Add card to player's hand.
@@ -80,13 +80,14 @@ function Card(suit, card) {
     };
     this.getValue = function() {
         var value = this.card % 13;
-        if (value > 10 || value == 0) {
+        
+        if (value > 10 || value == 0) { // Jack, Queen, King
             return 10;
         }
-        else if (value == 1) {
+        else if (value == 1) { // Ace
             return 11;
         }
-        return value;
+        return value; // All other cards.
     };
 }
 
@@ -134,7 +135,7 @@ function Hand(card1, card2) {
         
         for (var i = 0; i < this.cards.length; i++) {
           total += this.cards[i].getValue();
-          numAces++;
+          if (this.cards[i].getValue() == 11) numAces++;
         }
         // 
         temp = total;
@@ -142,10 +143,11 @@ function Hand(card1, card2) {
             temp -= 10;
             numAces -= 1;
         }
-        return total;
+        if (temp < total) return temp
+        else return total;
     };
     this.printHand = function() {
-        var str = "";
+        var hand = new Array();
         var suit = 0;
         var royal = "";
         
@@ -179,27 +181,95 @@ function Hand(card1, card2) {
                         royal = "King";
                         break;
                 }
-              str += royal + " of " + suit + "\n";
+                //str += royal + " of " + suit + "\n";
+                hand.push(royal + " of " + suit);
             }
             else {
-                str += this.cards[i].getNumber() + " of " + suit + "\n";
+                //str += this.cards[i].getNumber() + " of " + suit + "\n";
+                hand.push(this.cards[i].getNumber() + " of " + suit);
             }
             
         }
-        return str;
+        return hand;
     };
     this.hitMe = function(card) {
         this.cards.push(card);
     };
 }
 
+function displayPlayerData(hand, handEleId, scoreEleId) {
+  var ulPlayerHand = document.getElementById(handEleId);
+  var strHand = hand.printHand();
+  var newLi;
+  var newText = "";
+  var currentCard = 0;
+  
+  /* ======== HAND ======== */
+  // Li elements already exist.
+  if (ulPlayerHand.childNodes.length > 0) {
+    // Replace text of any existing li elements with the cards from the new hand.
+    for (var i = 0; i < ulPlayerHand.childNodes.length; i++) {
+      if (currentCard < strHand.length) {
+        ulPlayerHand.childNodes[i].firstChild.nodeValue = strHand[currentCard];
+        if (ulPlayerHand.childNodes[i].style.display == 'none') {
+          ulPlayerHand.childNodes[i].style.display = 'list-item';
+        }
+      }
+      else { // If there are no more cards, hide the remaining nodes.
+        ulPlayerHand.childNodes[i].style.display = 'none';
+      }
+      currentCard++;
+    } 
+  }
+  else { // If there are no li elements, create them.
+    for (var i = 0; i < strHand.length; i++) {
+      newLi = document.createElement("li");
+      newText = document.createTextNode(strHand[i]);
+      newLi.appendChild(newText);
+      ulPlayerHand.appendChild(newLi);
+    }
+  }
+  
+  // Create additional li elements if there are more cards than existing li elements.
+  if (strHand.length > ulPlayerHand.childNodes.length) {
+    for (; currentCard < strHand.length; currentCard++) {
+      newLi = document.createElement("li");
+      newText = document.createTextNode(strHand[currentCard]);
+      newLi.appendChild(newText);
+      ulPlayerHand.appendChild(newLi);
+    }     
+  }  
+  
+  /* ======== SCORE ======== */
+  if (document.getElementById(scoreEleId).hasChildNodes()) {
+    document.getElementById(scoreEleId).firstChild.nodeValue = hand.score();
+  }
+  else {
+    var scoreText = document.createTextNode(hand.score());
+    document.getElementById(scoreEleId).appendChild(scoreText);
+  }  
+}
+
+function displayResults(playerHand, dealerHand) {
+  if (document.getElementById("results").hasChildNodes()) {
+    document.getElementById("results").firstChild.nodeValue = declareWinner(playerHand, dealerHand);
+  }
+  else {
+    var resultsNode = document.createTextNode(declareWinner(playerHand, dealerHand));
+    document.getElementById("results").appendChild(resultsNode);
+  }  
+}
+
 function main() {
+    // Refresh the deck for each game.
+    deck = new Deck();
     var playerHand = playAsUser();
     var dealerHand = playAsDealer();
     
-    console.log("\nYour hand:\n" + playerHand.printHand());
-    console.log("Score: " + playerHand.score());
-    console.log("\nDealer's hand:\n" + dealerHand.printHand());
-    console.log("Score: " + dealerHand.score());
-    console.log("\nResult:\n" + declareWinner(playerHand, dealerHand));
+    // Display player data for user and dealer.
+    displayPlayerData(playerHand, "playerHand", "playerScore");
+    displayPlayerData(dealerHand, "dealerHand", "dealerScore");
+    
+    // Display whether the user won or lost.
+    displayResults(playerHand, dealerHand);
 }; 

@@ -2,13 +2,34 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
   <title>Blackjack</title>
+  <link href="blackjack.css" rel="stylesheet" type="text/css" />
   <script type="text/javascript" src="blackjack-final.js"></script>
 </head>
 
 <body>
 
-  <input value="Play Blackjack" type="button" onclick="main()" />
-
+  <div id="content">
+    <div id="playerData">
+      <h4>Your hand:</h4>
+      <ul id="playerHand"></ul>
+      <p>Your score:</p>
+      <p id="playerScore"></p>
+    </div>
+    
+    <div id="dealerData">
+      <h4>Dealer's hand:</h4>
+      <ul id="dealerHand"></ul>
+      <p>Dealer's score:</p>
+      <p id="dealerScore"></p>
+    </div>
+    
+    <div id="controls">
+      <h3 id="results"></h3>
+      <input id="playBtn" value="Play Blackjack" type="button" onclick="main()" />
+    </div>
+  </div>
+  
 </body>
 </html>

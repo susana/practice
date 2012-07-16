@@ -1,0 +1,8 @@
+/* CSS for blackjack.html */
+
+body {font-family: Helvetica, Arial; font-size: 11pt; color: #33332d;}
+
+#content {width:350px; margin-left: auto; margin-right: auto;}
+#playerData {width: 50%; float:left;}
+#dealerData {width: 50%; float:left;}
+#controls{width: 100%; clear:both; text-align:center;}
